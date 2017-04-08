@@ -13,7 +13,6 @@
 
 
 
-
 // fwd:
 struct tolua_Error;
 
@@ -88,6 +87,7 @@ public:
 		class cLuaCallback : public cItemCallback<Ty2>
 		{
 		public:
+			bool m_Error = false;
 			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
 				m_LuaState(a_LuaState),
 				m_FnRef(a_FnRef)
@@ -98,8 +98,13 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool ret = false;
-				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
-				return ret;
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret))
+				{
+					return ret;
+				}
+				// An error occurred
+				m_Error = true;
+				return true;
 			}
 			cLuaState & m_LuaState;
 			cLuaState::cRef & m_FnRef;
@@ -107,6 +112,12 @@ public:
 
 		// Call the DoWith function:
 		bool res = (Self->*DoWithFn)(ItemName, Callback);
+
+		// Check if callback aborted, due to an error
+		if (Callback.m_Error)
+		{
+			return lua_do_error(tolua_S, "Error in callback function. Enumeration has been aborted.");
+		}
 
 		// Push the result as the return value:
 		L.Push(res);
@@ -151,6 +162,7 @@ public:
 		class cLuaCallback : public cItemCallback<Ty2>
 		{
 		public:
+			bool m_Error = false;
 			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
 				m_LuaState(a_LuaState),
 				m_FnRef(a_FnRef)
@@ -161,8 +173,13 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool ret = false;
-				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
-				return ret;
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret))
+				{
+					return ret;
+				}
+				// An error occurred
+				m_Error = true;
+				return true;
 			}
 			cLuaState & m_LuaState;
 			cLuaState::cRef & m_FnRef;
@@ -170,6 +187,12 @@ public:
 
 		// Call the DoWith function:
 		bool res = (Ty1::Get()->*DoWithFn)(ItemName, Callback);
+
+		// Check if callback aborted, due to an error
+		if (Callback.m_Error)
+		{
+			return lua_do_error(tolua_S, "Error in callback function. Enumeration has been aborted.");
+		}
 
 		// Push the result as the return value:
 		L.Push(res);
@@ -214,6 +237,7 @@ public:
 		class cLuaCallback : public cItemCallback<Ty2>
 		{
 		public:
+			bool m_Error = false;
 			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
 				m_LuaState(a_LuaState),
 				m_FnRef(a_FnRef)
@@ -224,8 +248,13 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool ret = false;
-				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
-				return ret;
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret))
+				{
+					return ret;
+				}
+				// An error occurred
+				m_Error = true;
+				return true;
 			}
 			cLuaState & m_LuaState;
 			cLuaState::cRef & m_FnRef;
@@ -233,6 +262,12 @@ public:
 
 		// Call the DoWith function:
 		bool res = (Self->*DoWithFn)(ItemID, Callback);
+
+		// Check if callback aborted, due to an error
+		if (Callback.m_Error)
+		{
+			return lua_do_error(tolua_S, "Error in callback function. Enumeration has been aborted.");
+		}
 
 		// Push the result as the return value:
 		L.Push(res);
@@ -280,6 +315,7 @@ public:
 		class cLuaCallback : public cItemCallback<Ty2>
 		{
 		public:
+			bool m_Error = false;
 			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
 				m_LuaState(a_LuaState),
 				m_FnRef(a_FnRef)
@@ -290,8 +326,13 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool ret = false;
-				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
-				return ret;
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret))
+				{
+					return ret;
+				}
+				// An error occurred
+				m_Error = true;
+				return true;
 			}
 			cLuaState & m_LuaState;
 			cLuaState::cRef & m_FnRef;
@@ -299,6 +340,12 @@ public:
 
 		// Call the DoWith function:
 		bool res = (Self->*DoWithFn)(BlockX, BlockY, BlockZ, Callback);
+
+		// Check if callback aborted, due to an error
+		if (Callback.m_Error)
+		{
+			return lua_do_error(tolua_S, "Error in callback function. Enumeration has been aborted.");
+		}
 
 		// Push the result as the return value:
 		L.Push(res);
@@ -345,6 +392,7 @@ public:
 		class cLuaCallback : public cItemCallback<Ty2>
 		{
 		public:
+			bool m_Error = false;
 			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
 				m_LuaState(a_LuaState),
 				m_FnRef(a_FnRef)
@@ -355,8 +403,13 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool ret = false;
-				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret);
-				return ret;
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, ret))
+				{
+					return ret;
+				}
+				// An error occurred
+				m_Error = true;
+				return true;
 			}
 			cLuaState & m_LuaState;
 			cLuaState::cRef & m_FnRef;
@@ -364,6 +417,12 @@ public:
 
 		// Call the DoWith function:
 		bool res = (Self->*ForEachFn)(ChunkX, ChunkZ, Callback);
+
+		// Check if callback aborted, due to an error
+		if (Callback.m_Error)
+		{
+			return lua_do_error(tolua_S, "Error in callback function. Enumeration has been aborted.");
+		}
 
 		// Push the result as the return value:
 		L.Push(res);
@@ -413,6 +472,7 @@ public:
 		class cLuaCallback : public cItemCallback<Ty2>
 		{
 		public:
+			bool m_Error = false;
 			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FuncRef) :
 				m_LuaState(a_LuaState),
 				m_FnRef(a_FuncRef)
@@ -427,18 +487,22 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool res = false;
-				if (!m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res))
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res))
 				{
-					LOGWARNING("Failed to call Lua callback");
-					m_LuaState.LogStackTrace();
-					return true;  // Abort enumeration
+					return res;
 				}
-
-				return res;
+				// An error occurred
+				m_Error = true;
+				return true;
 			}
 		} Callback(L, FnRef);
 
 		bool res = (Self->*ForEachFn)(*Box, Callback);
+
+		if (Callback.m_Error)
+		{
+			return lua_do_error(tolua_S, "Error in callback function. Enumeration has been aborted.");
+		}
 
 		// Push the result as the return value:
 		L.Push(res);
@@ -482,6 +546,7 @@ public:
 		class cLuaCallback : public cItemCallback<Ty2>
 		{
 		public:
+			bool m_Error = false;
 			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
 				m_LuaState(a_LuaState),
 				m_FnRef(a_FnRef)
@@ -495,13 +560,24 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool res = false;  // By default continue the enumeration
-				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res);
-				return res;
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res))
+				{
+					return res;
+				}
+				// An error occurred
+				m_Error = true;
+				return true;
 			}
 		} Callback(L, FnRef);
 
 		// Call the enumeration:
 		bool res = (Self->*ForEachFn)(Callback);
+
+		// Check if callback aborted, due to an error
+		if (Callback.m_Error)
+		{
+			return lua_do_error(tolua_S, "Error in callback function. Enumeration has been aborted.");
+		}
 
 		// Push the return value:
 		L.Push(res);
@@ -540,6 +616,7 @@ public:
 		class cLuaCallback : public cItemCallback<Ty2>
 		{
 		public:
+			bool m_Error = false;
 			cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
 				m_LuaState(a_LuaState),
 				m_FnRef(a_FnRef)
@@ -553,13 +630,24 @@ public:
 			virtual bool Item(Ty2 * a_Item) override
 			{
 				bool res = false;  // By default continue the enumeration
-				m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res);
-				return res;
+				if (m_LuaState.Call(m_FnRef, a_Item, cLuaState::Return, res))
+				{
+					return res;
+				}
+				// An error occurred
+				m_Error = true;
+				return true;
 			}
 		} Callback(L, FnRef);
 
 		// Call the enumeration:
 		bool res = (Ty1::Get()->*ForEachFn)(Callback);
+
+		// Check if callback aborted, due to an error
+		if (Callback.m_Error)
+		{
+			return lua_do_error(tolua_S, "Error in callback function. Enumeration has been aborted.");
+		}
 
 		// Push the return value:
 		L.Push(res);

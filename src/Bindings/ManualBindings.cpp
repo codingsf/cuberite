@@ -1226,6 +1226,7 @@ static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 	class cLuaCallback : public cPluginManager::cCommandEnumCallback
 	{
 	public:
+		bool m_Error = false;
 		cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
 			m_LuaState(a_LuaState),
 			m_FnRef(a_FnRef)
@@ -1237,15 +1238,30 @@ static int tolua_cPluginManager_ForEachCommand(lua_State * tolua_S)
 		{
 			UNUSED(a_Plugin);
 			bool ret = false;
-			m_LuaState.Call(m_FnRef, a_Command, a_Permission, a_HelpString, cLuaState::Return, ret);
-			return ret;
+			if (m_LuaState.Call(m_FnRef, a_Command, a_Permission, a_HelpString, cLuaState::Return, ret))
+			{
+				return ret;
+			}
+			// An error occurred
+			m_Error = true;
+			return true;
 		}
 		cLuaState & m_LuaState;
 		cLuaState::cRef & m_FnRef;
 	} Callback(L, FnRef);
 
-	// Execute and push the returned value:
-	L.Push(cPluginManager::Get()->ForEachCommand(Callback));
+	// Execute
+	bool res = cPluginManager::Get()->ForEachCommand(Callback);
+
+	// Check if callback aborted, due to an error
+	if (Callback.m_Error)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in callback function. Enumeration has been aborted.");
+	}
+
+	// Push the returned value
+	L.Push(res);
+
 	return 1;
 }
 
@@ -1284,6 +1300,7 @@ static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 	class cLuaCallback : public cPluginManager::cCommandEnumCallback
 	{
 	public:
+		bool m_Error = false;
 		cLuaCallback(cLuaState & a_LuaState, cLuaState::cRef & a_FnRef):
 			m_LuaState(a_LuaState),
 			m_FnRef(a_FnRef)
@@ -1296,15 +1313,29 @@ static int tolua_cPluginManager_ForEachConsoleCommand(lua_State * tolua_S)
 			UNUSED(a_Plugin);
 			UNUSED(a_Permission);
 			bool ret = false;
-			m_LuaState.Call(m_FnRef, a_Command, a_HelpString, cLuaState::Return, ret);
-			return ret;
+			if (m_LuaState.Call(m_FnRef, a_Command, a_HelpString, cLuaState::Return, ret))
+			{
+				return ret;
+			}
+			// An error occurred
+			m_Error = true;
+			return true;
 		}
 		cLuaState & m_LuaState;
 		cLuaState::cRef & m_FnRef;
 	} Callback(L, FnRef);
 
-	// Execute and push the returned value:
-	L.Push(cPluginManager::Get()->ForEachConsoleCommand(Callback));
+	// Execute
+	bool res = cPluginManager::Get()->ForEachConsoleCommand(Callback);
+
+	// Check if callback aborted, due to an error
+	if (Callback.m_Error)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in callback function. Enumeration has been aborted.");
+	}
+
+	// Push the returned value
+	L.Push(res);
 	return 1;
 }
 

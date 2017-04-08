@@ -241,15 +241,29 @@ static int tolua_cWorld_ForEachLoadedChunk(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Could not get function reference of parameter #2");
 	}
 
+	bool Error = false;
+
 	// Call the enumeration:
 	bool ret = World->ForEachLoadedChunk(
-		[&L, &FnRef](int a_ChunkX, int a_ChunkZ) -> bool
+		[&L, &FnRef, &Error](int a_ChunkX, int a_ChunkZ) -> bool
 		{
 			bool res = false;  // By default continue the enumeration
-			L.Call(FnRef, a_ChunkX, a_ChunkZ, cLuaState::Return, res);
-			return res;
+			if (L.Call(FnRef, a_ChunkX, a_ChunkZ, cLuaState::Return, res))
+			{
+				return res;
+			}
+			// An error occurred
+			Error = true;
+			return true;
 		}
 	);
+
+	// Check if callback aborted, due to an error
+	if (Error)
+	{
+		return cManualBindings::lua_do_error(tolua_S, "Error in callback function. Enumeration has been aborted.");
+	}
+
 
 	// Push the return value:
 	L.Push(ret);
